@@ -228,6 +228,18 @@ class graphite::config inherits graphite::params {
   # startup carbon engine
 
   if $graphite::gr_enable_carbon_cache {
+    file { '/etc/init.d/carbon-cache':
+      ensure  => file,
+      content => template("graphite/etc/init.d/${::osfamily}/carbon-cache.erb"),
+      mode    => '0750',
+      require => File['/opt/graphite/conf/carbon.conf'],
+    } ~>
+
+    exec { 'systemd-daemon-reload-for-graphite-carbon-cache':
+      command => '/bin/systemctl daemon-reload',
+      refreshonly => true,
+    } ->
+
     service { 'carbon-cache':
       ensure     => running,
       enable     => true,
@@ -235,16 +247,21 @@ class graphite::config inherits graphite::params {
       hasstatus  => true,
       require    => File['/etc/init.d/carbon-cache'],
     }
-
-    file { '/etc/init.d/carbon-cache':
-      ensure  => file,
-      content => template("graphite/etc/init.d/${::osfamily}/carbon-cache.erb"),
-      mode    => '0750',
-      require => File['/opt/graphite/conf/carbon.conf'],
-    }
   }
 
   if $graphite::gr_enable_carbon_relay {
+    file { '/etc/init.d/carbon-relay':
+      ensure  => file,
+      content => template("graphite/etc/init.d/${::osfamily}/carbon-relay.erb"),
+      mode    => '0750',
+      require => File['/opt/graphite/conf/carbon.conf'],
+    } ~>
+
+    exec { 'systemd-daemon-reload-for-graphite-carbon-relay':
+      command => '/bin/systemctl daemon-reload',
+      refreshonly => true,
+    } ->
+
     service { 'carbon-relay':
       ensure     => running,
       enable     => true,
@@ -253,15 +270,21 @@ class graphite::config inherits graphite::params {
       require    => File['/etc/init.d/carbon-relay'],
     }
 
-    file { '/etc/init.d/carbon-relay':
-      ensure  => file,
-      content => template("graphite/etc/init.d/${::osfamily}/carbon-relay.erb"),
-      mode    => '0750',
-      require => File['/opt/graphite/conf/carbon.conf'],
-    }
   }
 
   if $graphite::gr_enable_carbon_aggregator {
+    file { '/etc/init.d/carbon-aggregator':
+      ensure  => file,
+      content => template("graphite/etc/init.d/${::osfamily}/carbon-aggregator.erb"),
+      mode    => '0750',
+      require => File['/opt/graphite/conf/carbon.conf'],
+    } ~>
+
+    exec { 'systemd-daemon-reload-for-graphite-carbon-aggregator':
+      command => '/bin/systemctl daemon-reload',
+      refreshonly => true,
+    } ->
+
     service {'carbon-aggregator':
       ensure     => running,
       enable     => true,
@@ -270,11 +293,5 @@ class graphite::config inherits graphite::params {
       require    => File['/etc/init.d/carbon-aggregator'],
     }
 
-    file { '/etc/init.d/carbon-aggregator':
-      ensure  => file,
-      content => template("graphite/etc/init.d/${::osfamily}/carbon-aggregator.erb"),
-      mode    => '0750',
-      require => File['/opt/graphite/conf/carbon.conf'],
-    }
   }
 }
